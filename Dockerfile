@@ -83,6 +83,20 @@ RUN set -x \
     && chown -R slurm:slurm /var/*/slurm* \
     && /sbin/create-munge-key
 
+
+# install R
+ARG R_VERSION=3.5.1
+RUN yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
+    yum install -y yum-utils && \
+    curl -kO https://cdn.rstudio.com/r/centos-7/pkgs/R-${R_VERSION}-1-1.x86_64.rpm && \
+    yum install -y R-${R_VERSION}-1-1.x86_64.rpm && \
+    /opt/R/${R_VERSION}/bin/R --version && \
+    rm -rf R-${R_VERSION}-1-1.x86_64.rpm && \
+    ln -s /opt/R/${R_VERSION}/bin/R /usr/local/bin/R && \
+    ln -s /opt/R/${R_VERSION}/bin/Rscript /usr/local/bin/Rscript && \
+    R -e "install.packages('batchtools', repos = 'https://packagemanager.rstudio.com/all/__linux__/centos7/1409175')"
+
+
 COPY slurm.conf /etc/slurm/slurm.conf
 COPY slurmdbd.conf /etc/slurm/slurmdbd.conf
 
